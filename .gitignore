@@ -1,0 +1,26 @@
+# Compiled Object files
+*.o
+*.a
+*.so
+
+# Build
+*.exe
+*.dll
+*.dylib
+*.out
+*.test
+/pkg
+/bin
+
+# Coverage
+*.out
+
+# IDEs
+.idea/
+.vscode/
+
+# System files
+.DS_Store
+
+# Misc
+/vendor
