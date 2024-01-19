@@ -1,3 +1,7 @@
-# Stop
+# Ash
 
-C-like lang built in Go.
+WIP; General-purpose procedural programming language.
+
+---
+
+[License](https://github.com/drewxs/ash/blob/main/LICENSE)
