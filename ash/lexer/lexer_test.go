@@ -7,14 +7,16 @@ import (
 )
 
 func TestNextToken(t *testing.T) {
-	input := `let five = 5;
-let ten = 10;
+	input := `let five = 5.0;
+let point_one = .1;
 
 let add = fn(x, y) {
     x + y;
 };
 
-let result = add(five, ten);
+let result = add(five, point_one);
+!-/*5;
+5 < 10. > 5;
 `
 
 	tests := []struct {
@@ -24,12 +26,12 @@ let result = add(five, ten);
 		{token.LET, "let"},
 		{token.IDENT, "five"},
 		{token.ASSIGN, "="},
-		{token.INT, "5"},
+		{token.FLOAT, "5.0"},
 		{token.SEMICOLON, ";"},
 		{token.LET, "let"},
-		{token.IDENT, "ten"},
+		{token.IDENT, "point_one"},
 		{token.ASSIGN, "="},
-		{token.INT, "10"},
+		{token.FLOAT, ".1"},
 		{token.SEMICOLON, ";"},
 		{token.LET, "let"},
 		{token.IDENT, "add"},
@@ -54,8 +56,20 @@ let result = add(five, ten);
 		{token.LPAREN, "("},
 		{token.IDENT, "five"},
 		{token.COMMA, ","},
-		{token.IDENT, "ten"},
+		{token.IDENT, "point_one"},
 		{token.RPAREN, ")"},
+		{token.SEMICOLON, ";"},
+		{token.BANG, "!"},
+		{token.MINUS, "-"},
+		{token.SLASH, "/"},
+		{token.ASTERISK, "*"},
+		{token.INT, "5"},
+		{token.SEMICOLON, ";"},
+		{token.INT, "5"},
+		{token.LT, "<"},
+		{token.FLOAT, "10."},
+		{token.GT, ">"},
+		{token.INT, "5"},
 		{token.SEMICOLON, ";"},
 		{token.EOF, ""},
 	}
@@ -72,7 +86,7 @@ let result = add(five, ten);
 
 		if tok.Literal != tt.expectedLiteral {
 			t.Fatalf("tests[%d] - literal wrong. expected=%q, got=%q",
-				i, tt.expectedLiteral, tok.Type)
+				i, tt.expectedLiteral, tok.Literal)
 		}
 	}
 }
