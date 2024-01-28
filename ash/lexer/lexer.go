@@ -72,14 +72,7 @@ func (l *Lexer) NextToken() token.Token {
 			tok.Type = token.LookupIdent(tok.Literal)
 			return tok
 		} else if isNum(l.ch) {
-			literal, isFloat := l.readNum()
-			tok.Literal = literal
-			if isFloat {
-				tok.Type = token.FLOAT
-			} else {
-				tok.Type = token.INT
-			}
-			return tok
+			tok.Literal, tok.Type = l.readNum()
 		} else {
 			tok = newToken(token.ILLEGAL, l.ch)
 		}
@@ -129,16 +122,16 @@ func (l *Lexer) skipWhitespace() {
 	}
 }
 
-func (l *Lexer) readNum() (string, bool) {
+func (l *Lexer) readNum() (string, token.TokenType) {
 	position := l.position
-	isFloat := false
+	tokenType := token.LookupIdent("int")
 	for isNum(l.ch) {
 		if l.ch == '.' {
-			isFloat = true
+			tokenType = token.FLOAT
 		}
 		l.readChar()
 	}
-	return l.input[position:l.position], isFloat
+	return l.input[position:l.position], tokenType
 }
 
 func (l *Lexer) peekChar() byte {
