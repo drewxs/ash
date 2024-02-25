@@ -1,9 +1,8 @@
 package lexer
 
 import (
-	"testing"
-
 	"ash/token"
+	"testing"
 )
 
 func TestNextToken(t *testing.T) {
