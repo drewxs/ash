@@ -127,7 +127,7 @@ func (l *Lexer) readNum() (string, token.TokenType) {
 	tokenType := token.LookupIdent("int")
 	for isNum(l.ch) {
 		if l.ch == '.' {
-			tokenType = token.FLOAT
+			tokenType = token.LookupIdent("float")
 		}
 		l.readChar()
 	}
