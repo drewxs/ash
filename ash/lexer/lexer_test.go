@@ -6,16 +6,16 @@ import (
 )
 
 func TestNextToken(t *testing.T) {
-	input := `let five = 5.0;
-let point_one = .1;
+	input := `let five = 5;
+let ten = 10;
 
 let add = fn(x, y) {
     x + y;
 };
 
-let result = add(five, point_one);
+let result = add(five, ten);
 !-/*5;
-5 < 10. > 5;
+5 < 10 > 5;
 
 if (5 < 10) {
     return true;
@@ -34,12 +34,12 @@ if (5 < 10) {
 		{token.LET, "let"},
 		{token.IDENT, "five"},
 		{token.ASSIGN, "="},
-		{token.FLOAT, "5.0"},
+		{token.INT, "5"},
 		{token.SEMICOLON, ";"},
 		{token.LET, "let"},
-		{token.IDENT, "point_one"},
+		{token.IDENT, "ten"},
 		{token.ASSIGN, "="},
-		{token.FLOAT, ".1"},
+		{token.INT, "10"},
 		{token.SEMICOLON, ";"},
 		{token.LET, "let"},
 		{token.IDENT, "add"},
@@ -64,7 +64,7 @@ if (5 < 10) {
 		{token.LPAREN, "("},
 		{token.IDENT, "five"},
 		{token.COMMA, ","},
-		{token.IDENT, "point_one"},
+		{token.IDENT, "ten"},
 		{token.RPAREN, ")"},
 		{token.SEMICOLON, ";"},
 		{token.BANG, "!"},
@@ -75,7 +75,7 @@ if (5 < 10) {
 		{token.SEMICOLON, ";"},
 		{token.INT, "5"},
 		{token.LT, "<"},
-		{token.FLOAT, "10."},
+		{token.INT, "10"},
 		{token.GT, ">"},
 		{token.INT, "5"},
 		{token.SEMICOLON, ";"},
