@@ -469,6 +469,76 @@ func TestIfElseExpression(t *testing.T) {
 	}
 }
 
+func TestFunctionLiteralParsing(t *testing.T) {
+	input := `fn(x, y) { x + y; }`
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+
+	if len(program.Statements) != 1 {
+		t.Fatalf("program.Body does not contain %d statements. got=%d]\n", 1, len(program.Statements))
+	}
+
+	stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("program.Statements[0] is not ast.ExpressionStatement. got=%T", program.Statements[0])
+	}
+
+	fn, ok := stmt.Expression.(*ast.FunctionLiteral)
+	if !ok {
+		t.Fatalf("stmt.Expression is nto ast.FunctionLiteral. got=%T", stmt.Expression)
+	}
+
+	if len(fn.Parameters) != 2 {
+		t.Fatalf("function literal parameters wrong. want 2, got=%d\n", len(fn.Parameters))
+	}
+
+	testLiteralExpresison(t, fn.Parameters[0], "x")
+	testLiteralExpresison(t, fn.Parameters[1], "y")
+
+	if len(fn.Body.Statements) != 1 {
+		t.Fatalf("function.Body.Statements has not 1 statements. got=%d\n", len(fn.Body.Statements))
+	}
+
+	bodyStmt, ok := fn.Body.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("function body stmt is not ast.ExpressionStatement. got=%T", fn.Body.Statements[0])
+	}
+
+	testInfixExpression(t, bodyStmt.Expression, "x", "+", "y")
+}
+
+func TestFunctionParameterParsing(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected []string
+	}{
+		{input: "fn() {};", expected: []string{}},
+		{input: "fn(x) {};", expected: []string{"x"}},
+		{input: "fn(x, y, z) {};", expected: []string{"x", "y", "z"}},
+	}
+
+	for _, tt := range tests {
+		l := lexer.New(tt.input)
+		p := New(l)
+		program := p.ParseProgram()
+		checkParserErrors(t, p)
+
+		stmt := program.Statements[0].(*ast.ExpressionStatement)
+		fn := stmt.Expression.(*ast.FunctionLiteral)
+
+		if len(fn.Parameters) != len(tt.expected) {
+			t.Errorf("length parameters wrong. want %d, got=%d\n", len(tt.expected), len(fn.Parameters))
+		}
+
+		for i, ident := range tt.expected {
+			testLiteralExpresison(t, fn.Parameters[i], ident)
+		}
+	}
+}
+
 func checkParserErrors(t *testing.T, p *Parser) {
 	errors := p.Errors()
 	if len(errors) == 0 {
