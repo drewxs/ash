@@ -2,19 +2,18 @@ package repl
 
 import (
 	"ash/lexer"
-	"ash/token"
+	"ash/parser"
+	color "ash/utils"
 	"bufio"
 	"fmt"
 	"io"
 )
 
-const PROMPT = ">> "
-
 func Start(in io.Reader, out io.Writer) {
 	scanner := bufio.NewScanner(in)
 
 	for {
-		fmt.Printf(PROMPT)
+		fmt.Printf(color.Format(color.CYAN, ">> "))
 		scanned := scanner.Scan()
 		if !scanned {
 			return
@@ -22,9 +21,22 @@ func Start(in io.Reader, out io.Writer) {
 
 		line := scanner.Text()
 		l := lexer.New(line)
+		p := parser.New(l)
 
-		for tok := l.NextToken(); tok.Type != token.EOF; tok = l.NextToken() {
-			fmt.Printf("%+v\n", tok)
+		program := p.ParseProgram()
+		if len(p.Errors()) != 0 {
+			printParserErrors(out, p.Errors())
+			continue
 		}
+
+		io.WriteString(out, program.String())
+		io.WriteString(out, "\n")
+	}
+}
+
+func printParserErrors(out io.Writer, errors []string) {
+	for _, msg := range errors {
+		io.WriteString(out, color.Format(color.RED, "error: "))
+		io.WriteString(out, msg+"\n")
 	}
 }
