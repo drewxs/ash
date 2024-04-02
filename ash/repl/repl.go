@@ -3,6 +3,7 @@ package repl
 import (
 	"ash/evaluator"
 	"ash/lexer"
+	"ash/object"
 	"ash/parser"
 	color "ash/utils"
 	"bufio"
@@ -12,6 +13,7 @@ import (
 
 func Start(in io.Reader, out io.Writer) {
 	scanner := bufio.NewScanner(in)
+	env := object.NewEnvironment()
 
 	for {
 		fmt.Printf(color.Format(color.CYAN, ">> "))
@@ -30,7 +32,7 @@ func Start(in io.Reader, out io.Writer) {
 			continue
 		}
 
-		evaluated := evaluator.Eval(program)
+		evaluated := evaluator.Eval(program, env)
 		if evaluated != nil {
 			io.WriteString(out, evaluated.Inspect())
 			io.WriteString(out, "\n")
