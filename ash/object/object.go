@@ -20,6 +20,8 @@ const (
 	FUNCTION_OBJ     = "FUNCTION"
 	RETURN_VALUE_OBJ = "RETURN_VALUE"
 	BUILTIN_OBJ      = "BUILTIN"
+
+	ARRRAY_OBJ = "ARRAY"
 )
 
 type Object interface {
