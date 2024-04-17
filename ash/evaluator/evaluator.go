@@ -288,8 +288,11 @@ func evalArrayIndexExpression(array, index object.Object) object.Object {
 	idx := index.(*object.Integer).Value
 	max := int64(len(arrayObject.Elements) - 1)
 
-	if idx < 0 || idx > max {
+	if idx > max {
 		return NULL
+	}
+	if idx < 0 && -idx <= max+1 {
+		return arrayObject.Elements[max+idx+1]
 	}
 
 	return arrayObject.Elements[idx]
