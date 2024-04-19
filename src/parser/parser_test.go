@@ -316,8 +316,8 @@ func TestOperatorPrecedenceParsing(t *testing.T) {
 			"false",
 		},
 		{
-			"3 > 5 == false",
-			"((3 > 5) == false)",
+			"3.0 > 5 == false",
+			"((3.0 > 5) == false)",
 		},
 		{
 			"3 < 5 == true",

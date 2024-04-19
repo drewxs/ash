@@ -24,7 +24,7 @@ if (5 < 10) {
 }
 
 10 == 10;
-10 != 9;
+10 != 9.0;
 "foobar"
 "foo bar"
 [1, 2];
@@ -106,7 +106,7 @@ if (5 < 10) {
 		{token.SEMICOLON, ";"},
 		{token.INT, "10"},
 		{token.NOT_EQ, "!="},
-		{token.INT, "9"},
+		{token.FLOAT, "9.0"},
 		{token.SEMICOLON, ";"},
 		{token.STRING, "foobar"},
 		{token.STRING, "foo bar"},
