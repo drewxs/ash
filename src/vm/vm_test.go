@@ -14,7 +14,7 @@ func TestIngegerArithmetic(t *testing.T) {
 	tests := []vmTestCase{
 		{"1", 1},
 		{"2", 2},
-		{"1 + 2", 2}, // fix
+		{"1 + 2", 3},
 	}
 
 	runVmTests(t, tests)
