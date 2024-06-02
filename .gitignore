@@ -9,18 +9,18 @@
 *.dylib
 *.out
 *.test
-/pkg
-/bin
+pkg
+bin
 
 # Coverage
 *.out
 
 # IDEs
-.idea/
-.vscode/
+.idea
+.vscode
 
 # System files
 .DS_Store
 
 # Misc
-/vendor
+vendor
