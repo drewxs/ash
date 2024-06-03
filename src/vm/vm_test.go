@@ -24,6 +24,8 @@ func TestIngegerArithmetic(t *testing.T) {
 		{"4 * 2 + 10", 18},
 		{"4 + 2 * 10", 24},
 		{"3 * (2 + 4)", 18},
+		{"-5", -5},
+		{"-10 + 100 + -50", 40},
 	}
 
 	runVmTests(t, tests)
@@ -50,6 +52,12 @@ func TestBooleanExpressions(t *testing.T) {
 		{"(1 < 2) == false", false},
 		{"(1 > 2) == true", false},
 		{"(1 > 2) == false", true},
+		{"!true", false},
+		{"!false", true},
+		{"!5", false},
+		{"!!true", true},
+		{"!!false", false},
+		{"!!5", true},
 	}
 
 	runVmTests(t, tests)
