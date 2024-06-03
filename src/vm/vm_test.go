@@ -18,7 +18,7 @@ func TestIngegerArithmetic(t *testing.T) {
 		{"0 - 4", -4},
 		{"3 * 2", 6},
 		{"10 / 2", 5},
-		{"12 / 4 * 3 + 10 - 5", 17},
+		{"12 / 4 * 3 + 10 - 5", 14},
 		{"2 + 2 + 2 + 2 - 8", 0},
 		{"2 * 2 * 2 * 2 * 2", 32},
 		{"4 * 2 + 10", 18},
@@ -33,6 +33,23 @@ func TestBooleanExpressions(t *testing.T) {
 	tests := []vmTestCase{
 		{"true", true},
 		{"false", false},
+		{"1 < 2", true},
+		{"1 > 2", false},
+		{"1 < 1", false},
+		{"1 > 1", false},
+		{"1 == 1", true},
+		{"1 != 1", false},
+		{"1 == 2", false},
+		{"1 != 2", true},
+		{"true == true", true},
+		{"true == false", false},
+		{"false == true", false},
+		{"true != false", true},
+		{"false != true", true},
+		{"(1 < 2) == true", true},
+		{"(1 < 2) == false", false},
+		{"(1 > 2) == true", false},
+		{"(1 > 2) == false", true},
 	}
 
 	runVmTests(t, tests)
