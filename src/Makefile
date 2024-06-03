@@ -14,3 +14,14 @@ run: build
 .PHONY = clean
 clean:
 	rm -f ./bin
+
+.PHONY = test
+test:
+	go test ./ast
+	go test ./code
+	go test ./compiler
+	go test ./evaluator
+	go test ./lexer
+	go test ./object
+	go test ./parser
+	go test ./vm
