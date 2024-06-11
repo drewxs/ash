@@ -11,6 +11,7 @@ const StackSize = 2048
 
 var True = &object.Boolean{Value: true}
 var False = &object.Boolean{Value: false}
+var Null = &object.Null{}
 
 type VM struct {
 	constants    []object.Object
@@ -41,33 +42,46 @@ func (vm *VM) Run() error {
 			if err != nil {
 				return err
 			}
+
 		case code.OpPop:
 			vm.pop()
+
 		case code.OpAdd, code.OpSub, code.OpMul, code.OpDiv:
 			err := vm.executeBinaryOp(op)
 			if err != nil {
 				return err
 			}
+
 		case code.OpTrue:
 			err := vm.push(True)
 			if err != nil {
 				return err
 			}
+
 		case code.OpFalse:
 			err := vm.push(False)
 			if err != nil {
 				return err
 			}
+
+		case code.OpNull:
+			err := vm.push(Null)
+			if err != nil {
+				return err
+			}
+
 		case code.OpEqual, code.OpNotEqual, code.OpGreaterThan:
 			err := vm.executeComparison(op)
 			if err != nil {
 				return err
 			}
+
 		case code.OpBang:
 			err := vm.executeBangOp()
 			if err != nil {
 				return err
 			}
+
 		case code.OpMinus:
 			err := vm.executeMinusOp()
 			if err != nil {
@@ -187,7 +201,9 @@ func (vm *VM) executeBangOp() error {
 	op := vm.pop()
 
 	switch op {
-	case False:
+	case True:
+		return vm.push(False)
+	case False, Null:
 		return vm.push(True)
 	default:
 		return vm.push(False)
@@ -216,6 +232,10 @@ func isTruthy(o object.Object) bool {
 	switch o := o.(type) {
 	case *object.Boolean:
 		return o.Value
+
+	case *object.Null:
+		return false
+
 	default:
 		return true
 	}
