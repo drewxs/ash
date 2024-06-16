@@ -202,7 +202,7 @@ func (c *Compiler) addInstruction(ins []byte) int {
 }
 
 func (c *Compiler) setLastInstruction(op code.Opcode, pos int) {
-	prev := c.prevInstruction
+	prev := c.lastInstruction
 	last := EmittedInstruction{Opcode: op, Position: pos}
 
 	c.prevInstruction = prev
