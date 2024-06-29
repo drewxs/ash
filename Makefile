@@ -1,4 +1,4 @@
-program :=ash
+program := ash
 
 .PHONY = all
 all: run
@@ -23,12 +23,20 @@ clean:
 .PHONY = test
 test:
 	@echo "Running tests..."
-	@(cd src && go test ./ast)
-	@(cd src && go test ./code)
-	@(cd src && go test ./compiler)
-	@(cd src && go test ./evaluator)
-	@(cd src && go test ./lexer)
-	@(cd src && go test ./object)
-	@(cd src && go test ./parser)
-	@(cd src && go test ./vm)
+	@mod=$(filter-out $@,$(MAKECMDGOALS)); \
+	if [ $$mod ]; then \
+		cd src && go test ./$$mod; \
+	else \
+		(cd src && go test ./ast) && \
+		(cd src && go test ./code) && \
+		(cd src && go test ./compiler) && \
+		(cd src && go test ./evaluator) && \
+		(cd src && go test ./lexer) && \
+		(cd src && go test ./object) && \
+		(cd src && go test ./parser) && \
+		(cd src && go test ./vm); \
+	fi
 	@echo "Done."
+
+%:
+	@:
