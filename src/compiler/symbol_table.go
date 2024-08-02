@@ -20,19 +20,19 @@ type SymbolTable struct {
 	numDefinitions int
 }
 
-func NewSymbolTable() *SymbolTable {
-	s := make(map[string]Symbol)
-	return &SymbolTable{store: s}
-}
-
 func NewEnclosedSymbolTable(outer *SymbolTable) *SymbolTable {
 	s := NewSymbolTable()
 	s.Outer = outer
 	return s
 }
 
+func NewSymbolTable() *SymbolTable {
+	s := make(map[string]Symbol)
+	return &SymbolTable{store: s}
+}
+
 func (s *SymbolTable) Define(name string) Symbol {
-	symbol := Symbol{Name: name, Index: s.numDefinitions, Scope: GlobalScope}
+	symbol := Symbol{Name: name, Index: s.numDefinitions}
 	if s.Outer == nil {
 		symbol.Scope = GlobalScope
 	} else {
@@ -47,7 +47,8 @@ func (s *SymbolTable) Define(name string) Symbol {
 func (s *SymbolTable) Resolve(name string) (Symbol, bool) {
 	obj, ok := s.store[name]
 	if !ok && s.Outer != nil {
-		return s.Outer.Resolve(name)
+		obj, ok = s.Outer.Resolve(name)
+		return obj, ok
 	}
 	return obj, ok
 }

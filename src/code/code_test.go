@@ -1,8 +1,6 @@
 package code
 
-import (
-	"testing"
-)
+import "testing"
 
 func TestMake(t *testing.T) {
 	tests := []struct {
@@ -52,7 +50,7 @@ func TestInstructionsString(t *testing.T) {
 	}
 
 	if concatted.String() != expected {
-		t.Errorf("instructions wrongly formatted.\nwant=%q\ngot =%q",
+		t.Errorf("instructions wrongly formatted.\nwant=%q\ngot=%q",
 			expected, concatted.String())
 	}
 }
@@ -77,7 +75,7 @@ func TestReadOperands(t *testing.T) {
 
 		operandsRead, n := ReadOperands(def, instruction[1:])
 		if n != tt.bytesRead {
-			t.Fatalf("n wrong. wanted=%d, got=%d", tt.bytesRead, n)
+			t.Fatalf("n wrong. want=%d, got=%d", tt.bytesRead, n)
 		}
 
 		for i, want := range tt.operands {

@@ -9,20 +9,22 @@ import (
 	"strings"
 )
 
+type BuiltinFunction func(args ...Object) Object
+
 type ObjectType string
 
 const (
-	BOOLEAN_OBJ = "BOOLEAN"
-	INTEGER_OBJ = "INTEGER"
-	FLOAT_OBJ   = "FLOAT"
-	STRING_OBJ  = "STRING"
-
 	NULL_OBJ  = "NULL"
 	ERROR_OBJ = "ERROR"
 
-	FUNCTION_OBJ     = "FUNCTION"
+	INTEGER_OBJ = "INTEGER"
+	BOOLEAN_OBJ = "BOOLEAN"
+	STRING_OBJ  = "STRING"
+
 	RETURN_VALUE_OBJ = "RETURN_VALUE"
-	BUILTIN_OBJ      = "BUILTIN"
+
+	FUNCTION_OBJ = "FUNCTION"
+	BUILTIN_OBJ  = "BUILTIN"
 
 	ARRAY_OBJ = "ARRAY"
 	HASH_OBJ  = "HASH"
@@ -30,9 +32,28 @@ const (
 	COMPILED_FUNCTION_OBJ = "COMPILED_FUNCTION_OBJ"
 )
 
+type HashKey struct {
+	Type  ObjectType
+	Value uint64
+}
+
+type Hashable interface {
+	HashKey() HashKey
+}
+
 type Object interface {
 	Type() ObjectType
 	Inspect() string
+}
+
+type Integer struct {
+	Value int64
+}
+
+func (i *Integer) Type() ObjectType { return INTEGER_OBJ }
+func (i *Integer) Inspect() string  { return fmt.Sprintf("%d", i.Value) }
+func (i *Integer) HashKey() HashKey {
+	return HashKey{Type: i.Type(), Value: uint64(i.Value)}
 }
 
 type Boolean struct {
@@ -41,27 +62,17 @@ type Boolean struct {
 
 func (b *Boolean) Type() ObjectType { return BOOLEAN_OBJ }
 func (b *Boolean) Inspect() string  { return fmt.Sprintf("%t", b.Value) }
+func (b *Boolean) HashKey() HashKey {
+	var value uint64
 
-type String struct {
-	Value string
+	if b.Value {
+		value = 1
+	} else {
+		value = 0
+	}
+
+	return HashKey{Type: b.Type(), Value: value}
 }
-
-func (s *String) Type() ObjectType { return STRING_OBJ }
-func (s *String) Inspect() string  { return s.Value }
-
-type Integer struct {
-	Value int64
-}
-
-func (i *Integer) Type() ObjectType { return INTEGER_OBJ }
-func (i *Integer) Inspect() string  { return fmt.Sprintf("%d", i.Value) }
-
-type Float struct {
-	Value float64
-}
-
-func (i *Float) Type() ObjectType { return FLOAT_OBJ }
-func (i *Float) Inspect() string  { return fmt.Sprintf("%f", i.Value) }
 
 type Null struct{}
 
@@ -107,7 +118,18 @@ func (f *Function) Inspect() string {
 	return out.String()
 }
 
-type BuiltinFunction func(args ...Object) Object
+type String struct {
+	Value string
+}
+
+func (s *String) Type() ObjectType { return STRING_OBJ }
+func (s *String) Inspect() string  { return s.Value }
+func (s *String) HashKey() HashKey {
+	h := fnv.New64a()
+	h.Write([]byte(s.Value))
+
+	return HashKey{Type: s.Type(), Value: h.Sum64()}
+}
 
 type Builtin struct {
 	Fn BuiltinFunction
@@ -120,12 +142,12 @@ type Array struct {
 	Elements []Object
 }
 
-func (a *Array) Type() ObjectType { return ARRAY_OBJ }
-func (a *Array) Inspect() string {
+func (ao *Array) Type() ObjectType { return ARRAY_OBJ }
+func (ao *Array) Inspect() string {
 	var out bytes.Buffer
 
 	elements := []string{}
-	for _, e := range a.Elements {
+	for _, e := range ao.Elements {
 		elements = append(elements, e.Inspect())
 	}
 
@@ -134,37 +156,6 @@ func (a *Array) Inspect() string {
 	out.WriteString("]")
 
 	return out.String()
-}
-
-type HashKey struct {
-	Type  ObjectType
-	Value uint64
-}
-
-func (b *Boolean) HashKey() HashKey {
-	var value uint64
-
-	if b.Value {
-		value = 1
-	} else {
-		value = 0
-	}
-
-	return HashKey{Type: b.Type(), Value: value}
-}
-
-func (i *Integer) HashKey() HashKey {
-	return HashKey{Type: i.Type(), Value: uint64(i.Value)}
-}
-
-func (s *String) HashKey() HashKey {
-	h := fnv.New64a()
-	h.Write([]byte(s.Value))
-	return HashKey{Type: s.Type(), Value: h.Sum64()}
-}
-
-type Hashable interface {
-	HashKey() HashKey
 }
 
 type HashPair struct {
@@ -177,13 +168,13 @@ type Hash struct {
 }
 
 func (h *Hash) Type() ObjectType { return HASH_OBJ }
-
 func (h *Hash) Inspect() string {
 	var out bytes.Buffer
 
 	pairs := []string{}
 	for _, pair := range h.Pairs {
-		pairs = append(pairs, fmt.Sprintf("%s: %s", pair.Key.Inspect(), pair.Value.Inspect()))
+		pairs = append(pairs, fmt.Sprintf("%s: %s",
+			pair.Key.Inspect(), pair.Value.Inspect()))
 	}
 
 	out.WriteString("{")

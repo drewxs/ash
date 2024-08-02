@@ -15,17 +15,20 @@ func TestIntegerArithmetic(t *testing.T) {
 		{"1", 1},
 		{"2", 2},
 		{"1 + 2", 3},
-		{"0 - 4", -4},
-		{"3 * 2", 6},
-		{"10 / 2", 5},
-		{"12 / 4 * 3 + 10 - 5", 14},
-		{"2 + 2 + 2 + 2 - 8", 0},
+		{"1 - 2", -1},
+		{"1 * 2", 2},
+		{"4 / 2", 2},
+		{"50 / 2 * 2 + 10 - 5", 55},
+		{"5 * (2 + 10)", 60},
+		{"5 + 5 + 5 + 5 - 10", 10},
 		{"2 * 2 * 2 * 2 * 2", 32},
-		{"4 * 2 + 10", 18},
-		{"4 + 2 * 10", 24},
-		{"3 * (2 + 4)", 18},
+		{"5 * 2 + 10", 20},
+		{"5 + 2 * 10", 25},
+		{"5 * (2 + 10)", 60},
 		{"-5", -5},
-		{"-10 + 100 + -50", 40},
+		{"-10", -10},
+		{"-50 + 100 + -50", 0},
+		{"(5 + 10 * 2 + 15 / 3) * 2 + -10", 50},
 	}
 
 	runVmTests(t, tests)
@@ -44,8 +47,8 @@ func TestBooleanExpressions(t *testing.T) {
 		{"1 == 2", false},
 		{"1 != 2", true},
 		{"true == true", true},
+		{"false == false", true},
 		{"true == false", false},
-		{"false == true", false},
 		{"true != false", true},
 		{"false != true", true},
 		{"(1 < 2) == true", true},
@@ -58,7 +61,7 @@ func TestBooleanExpressions(t *testing.T) {
 		{"!!true", true},
 		{"!!false", false},
 		{"!!5", true},
-		{"!(if false { 5 })", false},
+		{"!(if false { 5; })", true},
 	}
 
 	runVmTests(t, tests)
@@ -68,7 +71,7 @@ func TestConditionals(t *testing.T) {
 	tests := []vmTestCase{
 		{"if true { 10 }", 10},
 		{"if true { 10 } else { 20 }", 10},
-		{"if false { 10 } else { 20 }", 20},
+		{"if false { 10 } else { 20 } ", 20},
 		{"if 1 { 10 }", 10},
 		{"if 1 < 2 { 10 }", 10},
 		{"if 1 < 2 { 10 } else { 20 }", 10},
@@ -103,9 +106,9 @@ func TestStringExpressions(t *testing.T) {
 
 func TestArrayLiterals(t *testing.T) {
 	tests := []vmTestCase{
-		{`[]`, []int{}},
-		{`[1, 2, 3]`, []int{1, 2, 3}},
-		{`[1 + 2, 3 - 4, 5 * 6]`, []int{3, -1, 30}},
+		{"[]", []int{}},
+		{"[1, 2, 3]", []int{1, 2, 3}},
+		{"[1 + 2, 3 * 4, 5 + 6]", []int{3, 12, 11}},
 	}
 
 	runVmTests(t, tests)
@@ -114,18 +117,17 @@ func TestArrayLiterals(t *testing.T) {
 func TestHashLiterals(t *testing.T) {
 	tests := []vmTestCase{
 		{
-			`{}`,
-			map[object.HashKey]int64{},
+			"{}", map[object.HashKey]int64{},
 		},
 		{
-			`{1: 2, 3: 4}`,
+			"{1: 2, 2: 3}",
 			map[object.HashKey]int64{
 				(&object.Integer{Value: 1}).HashKey(): 2,
-				(&object.Integer{Value: 3}).HashKey(): 4,
+				(&object.Integer{Value: 2}).HashKey(): 3,
 			},
 		},
 		{
-			`{1 + 1: 2 * 2, 3 + 3: 4 * 4}`,
+			"{1 + 1: 2 * 2, 3 + 3: 4 * 4}",
 			map[object.HashKey]int64{
 				(&object.Integer{Value: 2}).HashKey(): 4,
 				(&object.Integer{Value: 6}).HashKey(): 16,
@@ -153,30 +155,30 @@ func TestIndexExpressions(t *testing.T) {
 	runVmTests(t, tests)
 }
 
-func TesFunctionsWithoutArguments(t *testing.T) {
+func TestCallingFunctionsWithoutArguments(t *testing.T) {
 	tests := []vmTestCase{
 		{
 			input: `
-            let fivePlusTen = fn() { 5 + 10; };
-            fivePlusTen();
-            `,
+		let five_plus_ten = fn() { 5 + 10; };
+		five_plus_ten();
+		`,
 			expected: 15,
 		},
 		{
 			input: `
-            let one = fn() { 1; };
-            let two = fn() { 2; };
-            one() + two()
-            `,
+		let one = fn() { 1; };
+		let two = fn() { 2; };
+		one() + two()
+		`,
 			expected: 3,
 		},
 		{
 			input: `
-            let a = fn() { 1 };
-            let b = fn() { a() + 1 };
-            let c = fn() { b() + 1 };
-            c();
-            `,
+		let a = fn() { 1 };
+		let b = fn() { a() + 1 };
+		let c = fn() { b() + 1 };
+		c();
+		`,
 			expected: 3,
 		},
 	}
@@ -184,20 +186,20 @@ func TesFunctionsWithoutArguments(t *testing.T) {
 	runVmTests(t, tests)
 }
 
-func TestFunctionsWithReturnStatements(t *testing.T) {
+func TestFunctionsWithReturnStatement(t *testing.T) {
 	tests := []vmTestCase{
 		{
 			input: `
-            let earlyExit = fn() { return 99; 100; };
-            earlyExit();
-            `,
+		let early_exit = fn() { return 99; 100; };
+		early_exit();
+		`,
 			expected: 99,
 		},
 		{
 			input: `
-            let earlyExit = fn() { return 99; return 100; };
-            earlyExit();
-            `,
+		let early_exit = fn() { return 99; return 100; };
+		early_exit();
+		`,
 			expected: 99,
 		},
 	}
@@ -209,18 +211,18 @@ func TestFunctionsWithoutReturnValue(t *testing.T) {
 	tests := []vmTestCase{
 		{
 			input: `
-            let noReturn = fn() { };
-            noReturn();
-            `,
+		let no_return = fn() { };
+		no_return();
+		`,
 			expected: Null,
 		},
 		{
 			input: `
-            let noReturn = fn() { };
-            let noReturn2 = fn() { noReturn(); };
-            noReturn();
-            noReturn2();
-            `,
+		let no_return = fn() { };
+		let no_return_two = fn() { no_return(); };
+		no_return();
+		no_return_two();
+		`,
 			expected: Null,
 		},
 	}
@@ -232,12 +234,20 @@ func TestFirstClassFunctions(t *testing.T) {
 	tests := []vmTestCase{
 		{
 			input: `
-            let returnsOneReturner = fn() {
-                let returnsOne = fn() { return 1; };
-                returnsOne;
-            };
-            returnsOneReturner()();
-            `,
+		let returns_one = fn() { 1; };
+		let returns_one_returner = fn() { returns_one; };
+		returns_one_returner()();
+		`,
+			expected: 1,
+		},
+		{
+			input: `
+		let returns_one_returner = fn() {
+			let returns_one = fn() { 1; };
+			returns_one;
+		};
+		returns_one_returner()();
+		`,
 			expected: 1,
 		},
 	}
@@ -249,47 +259,47 @@ func TestCallingFunctionsWithBindings(t *testing.T) {
 	tests := []vmTestCase{
 		{
 			input: `
-            let one = fn() { let one = 1; one };
-            one();
-            `,
+		let one = fn() { let one = 1; one };
+		one();
+		`,
 			expected: 1,
 		},
 		{
 			input: `
-            let oneAndTwo = fn() { let one = 1; let two = 2; one + two; };
-            oneAndTwo();
-            `,
+		let one_and_two = fn() { let one = 1; let two = 2; one + two; };
+		one_and_two();
+		`,
 			expected: 3,
 		},
 		{
 			input: `
-            let oneAndTwo = fn() { let one = 1; let two = 2; one + two; };
-            let threeAndFour = fn() { let three = 3; let four = 4; three + four; };
-            oneAndTwo() + threeAndFour();
-            `,
+		let one_and_two = fn() { let one = 1; let two = 2; one + two; };
+		let three_and_four = fn() { let three = 3; let four = 4; three + four; };
+		one_and_two() + three_and_four();
+		`,
 			expected: 10,
 		},
 		{
 			input: `
-            let firstFoobar = fn() { let foobar = 50; foobar; };
-            let secondFoobar = fn() { let foobar = 100; foobar; };
-            firstFoobar() + secondFoobar();
-            `,
+		let first_foobar = fn() { let foobar = 50; foobar; };
+		let second_foobar = fn() { let foobar = 100; foobar; };
+		first_foobar() + second_foobar();
+		`,
 			expected: 150,
 		},
 		{
 			input: `
-            let globalSeed = 50;
-            let minusOne = fn() {
-                let num = 1;
-                globalSeed - num;
-            }
-            let minusTwo = fn() {
-                let num = 2;
-                globalSeed - num;
-            }
-            minusOne() + minusTwo();
-            `,
+		let global_seed = 50;
+		let minus_one = fn() {
+			let num = 1;
+			global_seed - num;
+		}
+		let minus_two = fn() {
+			let num = 2;
+			global_seed - num;
+		}
+		minus_one() + minus_two();
+		`,
 			expected: 97,
 		},
 	}
@@ -301,66 +311,65 @@ func TestCallingFunctionsWithArgumentsAndBindings(t *testing.T) {
 	tests := []vmTestCase{
 		{
 			input: `
-            let identity = fn(a) { a; };
-            identity(4);
-            `,
+		let identity = fn(a) { a; };
+		identity(4);
+		`,
 			expected: 4,
 		},
 		{
 			input: `
-            let sum = fn(a, b) { a + b; };
-            sum(1, 2);
-            `,
+		let sum = fn(a, b) { a + b; };
+		sum(1, 2);
+		`,
 			expected: 3,
 		},
 		{
 			input: `
-            let sum = fn(a, b) {
-                let c = a + b;
-                c;
-            };
-            sum(1, 2);
-            `,
+		let sum = fn(a, b) {
+			let c = a + b;
+			c;
+		};
+		sum(1, 2);
+		`,
 			expected: 3,
 		},
 		{
 			input: `
-            let sum = fn(a, b) {
-                let c = a + b;
-                c;
-            };
-            sum(1, 2) + sum(3, 4);
-            `,
+		let sum = fn(a, b) {
+			let c = a + b;
+			c;
+		};
+		sum(1, 2) + sum(3, 4);`,
 			expected: 10,
 		},
 		{
 			input: `
-            let sum = fn(a, b) {
-                let c = a + b;
-                c;
-            };
-            let outer = fn() {
-                sum(1, 2) + sum(3, 4);
-            };
-            outer();
-            `,
+		let sum = fn(a, b) {
+			let c = a + b;
+			c;
+		};
+		let outer = fn() {
+			sum(1, 2) + sum(3, 4);
+		};
+		outer();
+		`,
 			expected: 10,
 		},
 		{
 			input: `
-            let globalNum = 10;
+		let global_num = 10;
 
-            let sum = fn(a, b) {
-                let c = a + b;
-                c + globalNum;
-            };
+		let sum = fn(a, b) {
+			let c = a + b;
+			c + global_num;
+		};
 
-            let outer = fn() {
-                sum(1, 2) + sum(3, 4) + globalNum;
-            };
+		let outer = fn() {
+			sum(1, 2) + sum(3, 4) + global_num;
+		};
 
-            outer() + globalNum;
-            `,
+		outer() + global_num;
+		`,
 			expected: 50,
 		},
 	}
@@ -375,11 +384,11 @@ func TestCallingFunctionsWithWrongArguments(t *testing.T) {
 			expected: `wrong number of arguments: want=0, got=1`,
 		},
 		{
-			input:    `fn(x) { x; }();`,
+			input:    `fn(a) { a; }();`,
 			expected: `wrong number of arguments: want=1, got=0`,
 		},
 		{
-			input:    `fn(x, y) { x + y; }(1);`,
+			input:    `fn(a, b) { a + b; }(1);`,
 			expected: `wrong number of arguments: want=2, got=1`,
 		},
 	}
@@ -395,7 +404,7 @@ func TestCallingFunctionsWithWrongArguments(t *testing.T) {
 
 		vm := New(comp.Bytecode())
 		err = vm.Run()
-		if err != nil {
+		if err == nil {
 			t.Fatalf("expected VM error but resulted in none.")
 		}
 
@@ -416,13 +425,13 @@ func runVmTests(t *testing.T, tests []vmTestCase) {
 	for _, tt := range tests {
 		program := parse(tt.input)
 
-		c := compiler.New()
-		err := c.Compile(program)
+		comp := compiler.New()
+		err := comp.Compile(program)
 		if err != nil {
 			t.Fatalf("compiler error: %s", err)
 		}
 
-		vm := New(c.Bytecode())
+		vm := New(comp.Bytecode())
 		err = vm.Run()
 		if err != nil {
 			t.Fatalf("vm error: %s", err)
@@ -434,20 +443,35 @@ func runVmTests(t *testing.T, tests []vmTestCase) {
 	}
 }
 
-func testExpectedObject(t *testing.T, expected interface{}, actual object.Object) {
+func parse(input string) *ast.Program {
+	l := lexer.New(input)
+	p := parser.New(l)
+	return p.ParseProgram()
+}
+
+func testExpectedObject(
+	t *testing.T,
+	expected interface{},
+	actual object.Object,
+) {
 	t.Helper()
 
 	switch expected := expected.(type) {
+	case int:
+		err := testIntegerObject(int64(expected), actual)
+		if err != nil {
+			t.Errorf("testIntegerObject failed: %s", err)
+		}
+
 	case bool:
 		err := testBooleanObject(bool(expected), actual)
 		if err != nil {
 			t.Errorf("testBooleanObject failed: %s", err)
 		}
 
-	case int:
-		err := testIntegerObject(int64(expected), actual)
-		if err != nil {
-			t.Errorf("testIntegerObject failed: %s", err)
+	case *object.Null:
+		if actual != Null {
+			t.Errorf("object is not Null: %T (%+v)", actual, actual)
 		}
 
 	case string:
@@ -457,20 +481,20 @@ func testExpectedObject(t *testing.T, expected interface{}, actual object.Object
 		}
 
 	case []int:
-		arr, ok := actual.(*object.Array)
+		array, ok := actual.(*object.Array)
 		if !ok {
-			t.Errorf("object not Array. got=%T (%+v)", actual, actual)
+			t.Errorf("object not Array: %T (%+v)", actual, actual)
 			return
 		}
 
-		if len(arr.Elements) != len(expected) {
-			t.Errorf("wrong number of elements. want=%d, got=%d",
-				len(expected), len(arr.Elements))
+		if len(array.Elements) != len(expected) {
+			t.Errorf("wrong num of elements. want=%d, got=%d",
+				len(expected), len(array.Elements))
 			return
 		}
 
-		for i, e := range expected {
-			err := testIntegerObject(int64(e), arr.Elements[i])
+		for i, expectedElem := range expected {
+			err := testIntegerObject(int64(expectedElem), array.Elements[i])
 			if err != nil {
 				t.Errorf("testIntegerObject failed: %s", err)
 			}
@@ -479,7 +503,7 @@ func testExpectedObject(t *testing.T, expected interface{}, actual object.Object
 	case map[object.HashKey]int64:
 		hash, ok := actual.(*object.Hash)
 		if !ok {
-			t.Errorf("object not Hash. got=%T (%+v)", actual, actual)
+			t.Errorf("object is not Hash. got=%T (%+v)", actual, actual)
 			return
 		}
 
@@ -489,29 +513,18 @@ func testExpectedObject(t *testing.T, expected interface{}, actual object.Object
 			return
 		}
 
-		for k, v := range expected {
-			pair, ok := hash.Pairs[k]
+		for expectedKey, expectedValue := range expected {
+			pair, ok := hash.Pairs[expectedKey]
 			if !ok {
-				t.Error("no pair for given key in Pairs")
+				t.Errorf("no pair for given key in Pairs")
 			}
 
-			err := testIntegerObject(v, pair.Value)
+			err := testIntegerObject(expectedValue, pair.Value)
 			if err != nil {
 				t.Errorf("testIntegerObject failed: %s", err)
 			}
 		}
-
-	case *object.Null:
-		if actual != Null {
-			t.Errorf("object is not Null. %T (%+v)", actual, actual)
-		}
 	}
-}
-
-func parse(input string) *ast.Program {
-	l := lexer.New(input)
-	p := parser.New(l)
-	return p.ParseProgram()
 }
 
 func testIntegerObject(expected int64, actual object.Object) error {
@@ -529,21 +542,6 @@ func testIntegerObject(expected int64, actual object.Object) error {
 	return nil
 }
 
-func testStringObject(expected string, actual object.Object) error {
-	result, ok := actual.(*object.String)
-	if !ok {
-		return fmt.Errorf("object is not String. got=%T (%+v)",
-			actual, actual)
-	}
-
-	if result.Value != expected {
-		return fmt.Errorf("object has wrong value. got=%q, want=%q",
-			result.Value, expected)
-	}
-
-	return nil
-}
-
 func testBooleanObject(expected bool, actual object.Object) error {
 	result, ok := actual.(*object.Boolean)
 	if !ok {
@@ -553,6 +551,21 @@ func testBooleanObject(expected bool, actual object.Object) error {
 
 	if result.Value != expected {
 		return fmt.Errorf("object has wrong value. got=%t, want=%t",
+			result.Value, expected)
+	}
+
+	return nil
+}
+
+func testStringObject(expected string, actual object.Object) error {
+	result, ok := actual.(*object.String)
+	if !ok {
+		return fmt.Errorf("object is not String. got=%T (%+v)",
+			actual, actual)
+	}
+
+	if result.Value != expected {
+		return fmt.Errorf("object has wrong value. got=%q, want=%q",
 			result.Value, expected)
 	}
 
