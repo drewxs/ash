@@ -6,18 +6,18 @@ all: run
 .PHONY = build
 build:
 	@echo "Building..."
-	@(cd src && go build -o bin/$(program) .)
-	@echo "Build ready: src/bin/$(program)"
+	@(cd src && go build -o ../bin/$(program) .)
+	@echo "Build ready: bin/$(program)"
 
 .PHONY = run
 run: build
-	@echo "Running src/bin/$(program)..."
-	@src/bin/$(program)
+	@echo "Running bin/$(program)..."
+	@bin/$(program)
 
 .PHONY = clean
 clean:
 	@echo "Cleaning up..."
-	@rm -rf src/bin
+	@rm -rf bin
 	@echo "Done."
 
 .PHONY = test
