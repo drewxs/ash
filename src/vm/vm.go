@@ -395,7 +395,7 @@ func (vm *VM) buildHash(start, end int) (*object.Hash, error) {
 
 func (vm *VM) executeIndexExpression(l, i object.Object) error {
 	switch {
-	case l.Type() == object.ARRRAY_OBJ && i.Type() == object.INTEGER_OBJ:
+	case l.Type() == object.ARRAY_OBJ && i.Type() == object.INTEGER_OBJ:
 		return vm.executeArrayIndex(l, i)
 	case l.Type() == object.HASH_OBJ:
 		return vm.executeHashIndex(l, i)

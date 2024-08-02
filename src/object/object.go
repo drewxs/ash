@@ -24,8 +24,8 @@ const (
 	RETURN_VALUE_OBJ = "RETURN_VALUE"
 	BUILTIN_OBJ      = "BUILTIN"
 
-	ARRRAY_OBJ = "ARRAY"
-	HASH_OBJ   = "HASH"
+	ARRAY_OBJ = "ARRAY"
+	HASH_OBJ  = "HASH"
 
 	COMPILED_FUNCTION_OBJ = "COMPILED_FUNCTION_OBJ"
 )
@@ -120,7 +120,7 @@ type Array struct {
 	Elements []Object
 }
 
-func (a *Array) Type() ObjectType { return ARRRAY_OBJ }
+func (a *Array) Type() ObjectType { return ARRAY_OBJ }
 func (a *Array) Inspect() string {
 	var out bytes.Buffer
 
