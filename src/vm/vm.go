@@ -55,7 +55,7 @@ func (vm *VM) Run() error {
 	var op code.Opcode
 	var ip int
 
-	for vm.currFrame().ip < len(vm.currFrame().Instructions()) {
+	for vm.currFrame().ip < len(vm.currFrame().Instructions())-1 {
 		vm.currFrame().ip++
 
 		ip = vm.currFrame().ip
