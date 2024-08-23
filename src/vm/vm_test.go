@@ -439,6 +439,44 @@ func TestBuiltinFunctions(t *testing.T) {
 	runVmTests(t, tests)
 }
 
+func TestClosures(t *testing.T) {
+	tests := []vmTestCase{
+		{
+			input: `
+            let new_closure = fn(a) {
+                fn() { a; };
+            };
+            let closure = new_closure(1);
+            closure();
+            `,
+			expected: 1,
+		},
+		{
+			input: `
+            let new_adder = fn(a, b) {
+                fn(c) { a + b + c };
+            };
+            let adder = new_adder(1, 2);
+            adder(8);
+            `,
+			expected: 11,
+		},
+		{
+			input: `
+            let new_adder = fn(a, b) {
+                let c = a + b;
+                fn(d) { c + d };
+            };
+            let adder = new_adder(1, 2);
+            adder(8);
+            `,
+			expected: 11,
+		},
+	}
+
+	runVmTests(t, tests)
+}
+
 type vmTestCase struct {
 	input    string
 	expected interface{}

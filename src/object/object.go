@@ -198,8 +198,8 @@ func (cf *CompiledFunction) Inspect() string {
 }
 
 type Closure struct {
-	Fn  *CompiledFunction
-	Env *Environment
+	Fn   *CompiledFunction
+	Free []Object
 }
 
 func (c *Closure) Type() ObjectType { return CLOSURE_OBJ }
