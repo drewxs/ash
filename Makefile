@@ -24,7 +24,11 @@ clean:
 test:
 	@echo "Running tests..."
 	@mod=$(filter-out $@,$(MAKECMDGOALS)); \
-	if [ $$mod ]; then \
+	if echo $$mod | grep -q ":"; then \
+		mod_name=$$(echo $$mod | cut -d ':' -f 1); \
+		test_name=$$(echo $$mod | cut -d ':' -f 2); \
+		cd src && go test ./$$mod_name -run $$test_name; \
+	elif [ $$mod ]; then \
 		cd src && go test ./$$mod; \
 	else \
 		(cd src && go test ./ast) && \
