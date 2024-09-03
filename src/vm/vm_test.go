@@ -477,6 +477,58 @@ func TestClosures(t *testing.T) {
 	runVmTests(t, tests)
 }
 
+func TestRecursiveFunctions(t *testing.T) {
+	tests := []vmTestCase{
+		{
+			input: `
+            let count_down = fn(x) {
+                if x == 0 {
+                    return 0;
+                } else {
+                    count_down(x - 1);
+                }
+            };
+            count_down(1);
+            `,
+			expected: 0,
+		},
+		{
+			input: `
+            let count_down = fn(x) {
+                if x == 0 {
+                    return 0;
+                } else {
+                    count_down(x - 1);
+                }
+            };
+            let wrapper = fn() {
+                count_down(1);
+            };
+            wrapper();
+            `,
+			expected: 0,
+		},
+		{
+			input: `
+            let wrapper = fn() {
+                let count_down = fn(x) {
+                    if x == 0 {
+                        return 0;
+                    } else {
+                        count_down(x - 1);
+                    }
+                };
+                count_down(1);
+            };
+            wrapper();
+            `,
+			expected: 0,
+		},
+	}
+
+	runVmTests(t, tests)
+}
+
 type vmTestCase struct {
 	input    string
 	expected interface{}
@@ -493,6 +545,19 @@ func runVmTests(t *testing.T, tests []vmTestCase) {
 		if err != nil {
 			t.Fatalf("compiler error: %s", err)
 		}
+
+		// for i, constant := range comp.Bytecode().Constants {
+		// 	fmt.Printf("CONSTANT %d %p (%T):\n", i, constant, constant)
+		//
+		// 	switch constant := constant.(type) {
+		// 	case *object.CompiledFunction:
+		// 		fmt.Printf(" Instructions:\n%s", constant.Instructions)
+		// 	case *object.Integer:
+		// 		fmt.Printf(" Value: %d\n", constant.Value)
+		// 	}
+		//
+		// 	fmt.Printf("\n")
+		// }
 
 		vm := New(comp.Bytecode())
 		err = vm.Run()
