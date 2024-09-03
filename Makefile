@@ -42,5 +42,16 @@ test:
 	fi
 	@echo "Done."
 
+.PHONY = bench
+bench:
+	@echo "Running benchmarks..."
+	@(cd src && go build -o ../bin/bench ./benchmark)
+	@engine=$(filter-out $@,$(MAKECMDGOALS)); \
+	if [ $$engine ]; then \
+		bin/bench -engine=$$engine; \
+	else \
+		bin/bench; \
+	fi
+
 %:
 	@:
