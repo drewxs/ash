@@ -529,6 +529,30 @@ func TestRecursiveFunctions(t *testing.T) {
 	runVmTests(t, tests)
 }
 
+func TestRecursiveFibonacci(t *testing.T) {
+	tests := []vmTestCase{
+		{
+			input: `
+            let fib = fn(n) {
+                if n == 0 {
+                    0
+                } else {
+                    if n == 1 {
+                        1
+                    } else {
+                        fib(n - 1) + fib(n - 2)
+                    }
+                }
+            };
+            fib(15)
+            `,
+			expected: 610,
+		},
+	}
+
+	runVmTests(t, tests)
+}
+
 type vmTestCase struct {
 	input    string
 	expected interface{}
