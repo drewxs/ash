@@ -103,6 +103,27 @@ var Builtins = []struct {
 
 		return &Array{Elements: newElements}
 	}}},
+	{"set", &Builtin{Fn: func(args ...Object) Object {
+		if len(args) != 3 {
+			return newError("wrong number of arguments. got=%d, want=3",
+				len(args))
+		}
+		if args[0].Type() != HASH_OBJ {
+			return newError("argument to `set` must be HASH, got %s",
+				args[0].Type())
+		}
+
+		hash := args[0].(*Hash)
+		key := args[1]
+		keyType := key.Type()
+		if keyType != INTEGER_OBJ && keyType != STRING_OBJ {
+			return newError("hash key must be INTEGER or STRING, got %s",
+				args[0].Type())
+		}
+		hash.set(args[1], args[2])
+
+		return &Hash{Pairs: hash.Pairs}
+	}}},
 }
 
 func newError(format string, a ...interface{}) *Error {

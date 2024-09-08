@@ -185,6 +185,9 @@ func (h *Hash) Inspect() string {
 
 	return out.String()
 }
+func (h *Hash) set(key Object, value Object) {
+	h.Pairs[key.(Hashable).HashKey()] = HashPair{Key: key, Value: value}
+}
 
 type CompiledFunction struct {
 	Instructions  code.Instructions
