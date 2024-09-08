@@ -163,6 +163,31 @@ String -> Tokens -> AST -> Bytecode -> Objects
 -   Interpreter: Tree-walking
 -   Compiler: Stack-based VM
 
+## TODO
+
+-   [ ] LSP
+    -   [ ] Hover
+    -   [ ] Completions
+    -   [ ] Diagnostics
+    -   [ ] Signature help
+-   [ ] Treesitter grammar
+-   [ ] Linter
+-   [ ] Formatter
+-   [ ] REPL
+    -   [ ] History
+    -   [ ] Autocomplete
+    -   [ ] Commands
+        -   [ ] `clear`
+        -   [ ] `exit`
+-   [ ] Standard library
+-   [ ] Type system
+    -   [ ] Inference
+    -   [ ] Checking
+-   [ ] Compiler/VM optimizations
+    -   [ ] Tail call optimization
+    -   [ ] Constant folding
+    -   [ ] Dead code elimination
+
 ---
 
 [License](https://github.com/drewxs/ash/blob/main/LICENSE)
