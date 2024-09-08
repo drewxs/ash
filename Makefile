@@ -1,7 +1,7 @@
 program := ash
 
 .PHONY = all
-all: run
+all: build
 
 .PHONY = build
 build:
