@@ -90,6 +90,26 @@ Or move it to `/usr/local/bin`:
 mv bin/ash /usr/local/bin
 ```
 
+### Neovim support
+
+Register the filetype:
+
+```lua
+vim.filetype.add({
+  extension = {
+    ash = "ash",
+  },
+})
+```
+
+For syntax highlighting, add the following to your treesitter config:
+
+```lua
+vim.treesitter.language.register("rust", "ash")
+```
+
+Yes, we're using Rust for syntax highlighting (for now), it's the closest thing to Ash's syntax.
+
 ## Usage
 
 Start the REPL:
