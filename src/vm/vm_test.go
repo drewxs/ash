@@ -534,11 +534,8 @@ func TestRecursiveFibonacci(t *testing.T) {
 		{
 			input: `
             let fib = fn(n) {
-                if n == 0 { 0 }
-                else {
-                    if n == 1 { 1 }
-                    else { fib(n - 1) + fib(n - 2) }
-                }
+                if n < 2 { return n }
+                fib(n - 1) + fib(n - 2)
             };
             fib(15)
             `,
@@ -547,11 +544,8 @@ func TestRecursiveFibonacci(t *testing.T) {
 		{
 			input: `
             let fib = [fn(n) {
-                if n == 0 { 0 }
-                else {
-                    if n == 1 { 1 }
-                    else { fib(n - 1) + fib(n - 2) }
-                }
+                if n < 2 { return n }
+                fib(n - 1) + fib(n - 2)
             }][0];
             fib(15)
             `,
